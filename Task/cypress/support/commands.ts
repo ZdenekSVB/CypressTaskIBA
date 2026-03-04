@@ -24,32 +24,53 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 declare global {
-    namespace Cypress {
-      interface Chainable {
-        checkBackendHealth(): Chainable<void>;
-        structuralSanityCheck(): Chainable<void>;
-        cleanState(): Chainable<void>;
-      }
+  namespace Cypress {
+    interface Chainable {
+      checkBackendHealth(url?: string): Chainable<void>;
+      structuralSanityCheck(): Chainable<void>;
+      cleanState(): Chainable<void>;
+
+      visitLandingPage(): Chainable<void>;
+      visitMainPage(): Chainable<void>;
     }
-    }
+  }
+}
 
-  Cypress.Commands.add('checkBackendHealth', () => {
-    cy.intercept('GET', 'https://www.wikipedia.org/').as('mainPage');
-    cy.visit("https://www.wikipedia.org/");
-    cy.wait('@mainPage').then((interception) => {
-      expect(interception.response?.statusCode).to.eq(200);
-      expect(interception.response?.headers['content-type']).to.include('text/html');
-    });
+Cypress.Commands.add('checkBackendHealth', (url?: string) => {
+  const targetUrl = url || 'https://www.wikipedia.org/';
+
+  cy.intercept('GET', targetUrl).as('pageRequest');
+  cy.visit(targetUrl);
+
+  cy.wait('@pageRequest').then((interception) => {
+    expect(interception.response?.statusCode).to.eq(200);
+    expect(interception.response?.headers['content-type']).to.include('text/html');
   });
+});
 
-  Cypress.Commands.add('structuralSanityCheck', () => {
-    cy.get('body').should('be.visible');
-    cy.get('#searchInput').should('exist');
-  });
+Cypress.Commands.add('structuralSanityCheck', () => {
+  cy.get('body').should('be.visible');
+  cy.get('head').should('exist');
+  cy.get('script').should('exist');
+  cy.get('style').should('exist');
+});
 
-  Cypress.Commands.add('cleanState', () => {
-    cy.clearCookies();
-    cy.clearLocalStorage();
-  });
+Cypress.Commands.add('cleanState', () => {
+  cy.clearAllCookies();
+  cy.clearAllLocalStorage();
+  cy.clearAllSessionStorage();
+});
 
-export {};
+Cypress.Commands.add('visitLandingPage', () => {
+  cy.cleanState();
+  cy.checkBackendHealth('https://www.wikipedia.org/');
+  cy.structuralSanityCheck();
+});
+
+Cypress.Commands.add('visitMainPage', () => {
+  cy.cleanState();
+  cy.checkBackendHealth('https://en.wikipedia.org/wiki/Main_Page');
+  cy.structuralSanityCheck();
+});
+
+export { };
