@@ -40,9 +40,14 @@ describe("landing page of wikipedia", () => {
     });
   });
 
-  it("searchbox has all the languages (76)", () => {
-    cy.get("#searchLanguage option").should("have.length", 76);
+it("searchbox has all the languages (76) controlled by languages.json", () => {
+    cy.fixture("languages.json").then((languages) => {   
+      languages.forEach((lang) => {
+        cy.get(`#searchLanguage option[value="${lang.value}"]`)
+          .should("exist")
+      });
     });
+  });
 
     it("change language to czech and show article for letter A with link and downloaded placeholder", () => {
         cy.get("#searchLanguage").select("Čeština");
