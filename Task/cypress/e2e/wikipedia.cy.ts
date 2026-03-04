@@ -2,7 +2,9 @@
 describe("landing page of wikipedia", () => {
 
   beforeEach(() => {
-    cy.visit("https://www.wikipedia.org/");
+    cy.cleanState();
+    cy.checkBackendHealth();
+    cy.structuralSanityCheck();
   });
 
   it("check new components of the page for any wikipedia year celebration", () => {
