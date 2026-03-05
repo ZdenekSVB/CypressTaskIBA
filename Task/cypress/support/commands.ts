@@ -32,6 +32,8 @@ declare global {
 
       visitLandingPage(): Chainable<void>;
       visitMainPage(): Chainable<void>;
+
+      deleteFile(fileName: string): Chainable<void>;
     }
   }
 }
@@ -72,5 +74,11 @@ Cypress.Commands.add('visitMainPage', () => {
   cy.checkBackendHealth('https://en.wikipedia.org/wiki/Main_Page');
   cy.structuralSanityCheck();
 });
+
+Cypress.Commands.add('deleteFile', (fileName) => {
+  const filePath = `cypress/downloads/${fileName}`;
+  cy.task('fsDeleteFile', filePath);
+});
+
 
 export { };

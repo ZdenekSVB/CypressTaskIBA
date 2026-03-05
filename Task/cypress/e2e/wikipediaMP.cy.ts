@@ -126,6 +126,7 @@ describe("main page of english wikipedia", () => {
         cy.contains('button', 'Download').click();
         cy.wait("@pdfDownload").its("response.statusCode").should("eq", 200);
 
+        cy.deleteFile("Main_Page.pdf");
     });
 
     it("vyhledávání po zadání textu zobrazí našeptávač", () => {
