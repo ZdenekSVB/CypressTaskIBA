@@ -87,11 +87,3 @@ describe("landing page of wikipedia", () => {
 
 
 });
-
-describe("main page of english wikipedia", () => {
-
-    beforeEach(() => {
-        cy.visitMainPage();
-    });
-
-});
